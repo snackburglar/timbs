@@ -11,6 +11,7 @@ import NewsArticle from "./components/pages/NewsArticle";
 import About from "./components/pages/About";
 import Contact from "./components/pages/Contact";
 import NotFound from "./components/pages/NotFound";
+import ServerError from "./components/pages/ServerError";
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/news/:id" element={<NewsArticle />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/500" element={<ServerError />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
