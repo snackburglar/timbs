@@ -1,14 +1,15 @@
 # Timbertop United Shop
 
-Timbertop United Shop is a football club merchandise website prototype. Users will be able to browse Timbertop United products and view product information.
+Timbertop United Shop is a prototype football club merchandise website. Users can browse Timbertop United products and view product information.
 
-## Run the Website
+## Getting Started
 
 Install the dependencies:
 
 ```bash
 cd client
 npm install
+
 cd ../server
 npm install
 ```
@@ -27,4 +28,4 @@ cd client
 npm run dev
 ```
 
-Open the local URL shown by Vite in your browser.
+Open the local URL displayed by Vite in your browser.
