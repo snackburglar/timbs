@@ -12,6 +12,10 @@ import About from "./components/pages/About";
 import Contact from "./components/pages/Contact";
 import NotFound from "./components/pages/NotFound";
 import ServerError from "./components/pages/ServerError";
+import Login from "./components/pages/Login";
+import Register from "./components/pages/Register";
+import ProfileDashboard from "./components/pages/ProfileDashboard";
+import AdminDashboard from "./components/pages/AdminDashboard";
 
 function App() {
   return (
@@ -24,6 +28,10 @@ function App() {
         <Route path="/news/:id" element={<NewsArticle />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/profile" element={<ProfileDashboard />} />
+        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/500" element={<ServerError />} />
         <Route path="*" element={<NotFound />} />
       </Route>
