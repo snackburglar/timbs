@@ -26,6 +26,7 @@ const GlobalStyle = createGlobalStyle`
 const Root = styled.div`
   display: flex;
   flex-direction: column;
+  /* let the footer sit at the bottom even on short pages. */
   min-height: 100vh;
 `;
 
@@ -35,6 +36,7 @@ const MainContent = styled.main`
 `;
 
 const ContentRegion = styled.div`
+  /* keep content readable while leaving a small gutter on narrow screens. */
   width: min(100% - 2rem, 1200px);
   margin: 0 auto;
   padding: 2rem 0;

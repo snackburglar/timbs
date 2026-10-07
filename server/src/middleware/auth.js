@@ -12,6 +12,7 @@ function authenticate(req, res, next) {
 
   try {
     const payload = jwt.verify(token, jwtSecret);
+    // look up the current record so role changes apply without reissuing tokens.
     const user = users.find((candidate) => candidate.id === payload.sub);
     if (!user)
       return res.status(401).json({ error: "Authentication required" });
@@ -23,6 +24,7 @@ function authenticate(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
+  // authenticate must run first so req.user is available here.
   if (req.user.role !== "admin")
     return res.status(403).json({ error: "Administrator access required" });
   return next();

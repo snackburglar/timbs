@@ -16,6 +16,7 @@ const Article = styled.article`
 
 function NewsArticle() {
   const { id } = useParams();
+  // use the same not-found view as product details for unknown article ids.
   const { data: article, loading, error } = useApiResource(`/news/${id}`);
   if (loading) return <p>Loading article...</p>;
   if (error?.status === 404) return <NotFound />;

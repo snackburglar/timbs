@@ -156,6 +156,7 @@ const Status = styled.p`
 `;
 
 function Home() {
+  // load these independently so one unavailable section does not hide the other.
   const productsResource = useApiResource("/products?sort=price-desc");
   const newsResource = useApiResource("/news");
   const [email, setEmail] = useState("");
@@ -164,6 +165,7 @@ function Home() {
 
   async function subscribe(event) {
     event.preventDefault();
+    // reset the previous result before showing this submission's response.
     setNewsletterStatus("");
     setNewsletterError(false);
     try {
@@ -172,6 +174,7 @@ function Home() {
         body: JSON.stringify({ email }),
       });
       setNewsletterStatus(response.message);
+      // clear only after the server has accepted the subscription.
       setEmail("");
     } catch (error) {
       setNewsletterStatus(error.message);

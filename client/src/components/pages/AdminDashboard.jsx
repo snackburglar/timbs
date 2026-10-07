@@ -6,6 +6,7 @@ import ProductAdminPanel from "../admin/ProductAdminPanel";
 import { DashboardGrid, Page } from "../admin/AdminStyles";
 
 function AdminDashboard() {
+  // this controls the interface, while admin routes enforce access on the server.
   const user = getStoredUser();
 
   if (!user) return <Navigate to="/login" replace />;

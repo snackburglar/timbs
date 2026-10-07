@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const products = require("./data/products");
 const news = require("./data/news");
 
-// These arrays are the temporary in-memory repository layer for local development.
+// temporary storage before firestore
 const users = [
   {
     id: "admin-user",

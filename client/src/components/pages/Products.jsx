@@ -57,6 +57,7 @@ const ProductGrid = styled.div`
 
 function Products() {
   const [filters, setFilters] = useState({ q: "", category: "", sort: "name" });
+  // serializing the form state makes each filter change a new resource request.
   const query = new URLSearchParams(filters).toString();
   const {
     data: products,

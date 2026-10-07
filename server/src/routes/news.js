@@ -10,6 +10,7 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
   res.json({
+    // sort a copy so reads do not mutate the shared in-memory collection.
     data: [...news].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
   });
 });
@@ -53,6 +54,7 @@ router.put(
       return res.status(404).json({ error: "News article not found" });
     news[index] = {
       id: req.params.id,
+      // keep the existing timestamp when the update omits one.
       publishedAt: news[index].publishedAt,
       ...req.body,
     };

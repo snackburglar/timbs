@@ -22,6 +22,7 @@ const NewsGrid = styled.div`
 `;
 
 function News() {
+  // the api already returns newest-first, so the page can render the list directly.
   const { data: news, loading, error } = useApiResource("/news");
   return (
     <NewsPage>

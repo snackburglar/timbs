@@ -37,6 +37,7 @@ function NewsAdminPanel() {
     setArticle((current) => ({
       ...current,
       [name]: value,
+      // the api sorts by publishedAt, so keep it aligned with the date input.
       ...(name === "date" ? { publishedAt: value } : {}),
     }));
   }

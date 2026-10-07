@@ -38,6 +38,7 @@ const Price = styled.p`
 
 function ProductDetails() {
   const { id } = useParams();
+  // the route id selects the record, with the usual 404 view for a missing item.
   const { data: product, loading, error } = useApiResource(`/products/${id}`);
   if (loading) return <p>Loading product...</p>;
   if (error?.status === 404) return <NotFound />;

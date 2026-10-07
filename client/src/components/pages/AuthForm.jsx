@@ -62,6 +62,7 @@ function AuthForm({ isRegister = false }) {
 
   async function submit(event) {
     event.preventDefault();
+    // clear old feedback before starting a new request.
     setSubmitting(true);
     setFeedback("");
     setError(false);
@@ -72,10 +73,12 @@ function AuthForm({ isRegister = false }) {
         body: JSON.stringify(form),
       });
       if (isRegister) {
+        // registration creates an account but does not sign the user in.
         navigate("/login", {
           state: { message: "Account created. You can now log in." },
         });
       } else {
+        // save the token and user together so the header updates immediately.
         setAuthSession(response);
         navigate("/");
       }

@@ -9,6 +9,7 @@ const { makeId } = require("../utils");
 const router = express.Router();
 
 router.get("/", (req, res) => {
+  // normalize filters so matching is case-insensitive and whitespace-tolerant.
   const query = String(req.query.q || "")
     .trim()
     .toLowerCase();
@@ -16,6 +17,7 @@ router.get("/", (req, res) => {
     .trim()
     .toLowerCase();
   const sort = String(req.query.sort || "name");
+  // filter the collection first, then order only the records being returned.
   const result = products
     .filter(
       (product) =>
@@ -45,6 +47,7 @@ router.post(
   requireAdmin,
   validateBody(productSchema),
   (req, res) => {
+    // derive a stable route id from the name and reject collisions before saving.
     const product = { id: makeId(req.body.name), ...req.body };
     if (products.some((candidate) => candidate.id === product.id)) {
       return res

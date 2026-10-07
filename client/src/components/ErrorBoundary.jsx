@@ -10,10 +10,12 @@ class ErrorBoundary extends Component {
   }
 
   static getDerivedStateFromError() {
+    // switch to the fallback on the next render after a child throws.
     return { hasError: true };
   }
 
   componentDidCatch(error) {
+    // keep a useful trace in the console while showing a friendly page.
     console.error(error.message);
   }
 

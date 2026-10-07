@@ -59,6 +59,7 @@ const Price = styled.p`
 `;
 
 function ProductCard({ product }) {
+  // keep formatted prices intact while formatting numeric api values.
   const price =
     typeof product.price === "number"
       ? product.price.toLocaleString("en-AU", {

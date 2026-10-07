@@ -5,6 +5,7 @@ dotenv.config();
 const jwtSecret =
   process.env.JWT_SECRET || "local-development-secret-change-me";
 
+// flag the fallback so a local default is not mistaken for configured secrets.
 if (!process.env.JWT_SECRET) {
   console.warn(
     "JWT_SECRET is not configured; using the local development fallback.",

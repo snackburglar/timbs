@@ -7,6 +7,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/api/health", (req, res) => {
+  // expose the active storage mode for quick environment checks.
   res.json({ status: "ok", storage: "local-mock" });
 });
 

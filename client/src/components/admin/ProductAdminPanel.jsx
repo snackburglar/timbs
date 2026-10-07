@@ -47,6 +47,7 @@ function ProductAdminPanel() {
 
   async function saveProduct(event) {
     event.preventDefault();
+    // ids are route data, while the form keeps price as a text input value.
     const { id, ...payload } = product;
 
     try {

@@ -27,6 +27,7 @@ app.use((req, res) => {
   res.status(404).json({ error: "API route not found" });
 });
 
+// express identifies error middleware by its four-argument signature.
 app.use((error, req, res, next) => {
   if (
     error instanceof SyntaxError &&
@@ -39,6 +40,7 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ error: "An unexpected server error occurred" });
 });
 
+// importing the app for tests should not bind a listening port.
 if (require.main === module) {
   app.listen(port, () =>
     console.log(`Server is running at http://localhost:${port}`),

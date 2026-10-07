@@ -1,4 +1,4 @@
-// Local news records used until the Firestore repository is introduced.
+// temporary storage before firestore
 module.exports = [
   {
     id: "season-opener",

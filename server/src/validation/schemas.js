@@ -1,5 +1,6 @@
 const Joi = require("joi");
 
+// schemas trim and bound input before route handlers store or use it.
 const productSchema = Joi.object({
   name: Joi.string().trim().min(2).max(100).required(),
   category: Joi.string().trim().min(2).max(50).required(),
@@ -27,6 +28,7 @@ const newsSchema = Joi.object({
 
 const credentialsSchema = Joi.object({
   email: Joi.string().trim().email().required(),
+  // cap password length before passing it to bcrypt.
   password: Joi.string().min(8).max(72).required(),
 }).required();
 

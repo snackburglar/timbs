@@ -15,6 +15,7 @@ const { makeId, publicUser } = require("../utils");
 const router = express.Router();
 
 router.post("/register", validateBody(registrationSchema), async (req, res) => {
+  // one canonical form prevents duplicate accounts caused by email casing.
   const email = req.body.email.toLowerCase();
   if (users.some((user) => user.email === email)) {
     return res
@@ -26,6 +27,7 @@ router.post("/register", validateBody(registrationSchema), async (req, res) => {
     id: makeId(email),
     name: req.body.name,
     email,
+    // store only a salted hash, never the submitted password.
     passwordHash: await bcrypt.hash(req.body.password, 10),
     role: "user",
   };
@@ -42,6 +44,7 @@ router.post("/login", validateBody(credentialsSchema), async (req, res) => {
   }
 
   const token = jwt.sign({ role: user.role }, jwtSecret, {
+    // use the id as the subject so middleware can reload the current account.
     subject: user.id,
     expiresIn: "2h",
   });

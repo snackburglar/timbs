@@ -35,6 +35,7 @@ const Details = styled.dl`
 
 function ProfileDashboard() {
   const storedUser = getStoredUser();
+  // fetch the server copy rather than relying on potentially stale local details.
   const resource = useApiResource("/users/me");
   if (!storedUser) return <Navigate to="/login" replace />;
   if (resource.loading)
@@ -46,6 +47,7 @@ function ProfileDashboard() {
   if (resource.error)
     return (
       <Panel>
+        {/* an invalid token is recovered through the normal login flow. */}
         <p role="alert">Your session has expired. Please log in again.</p>
         <Link to="/login">Log in</Link>
       </Panel>

@@ -9,13 +9,15 @@ export default function useApiResource(path) {
   useEffect(() => {
     const controller = new AbortController();
     apiRequest(path, { signal: controller.signal })
-      .then((body) =>
-        setState({ data: body.data || body, loading: false, error: null }),
-      )
+      .then((body) => {
+        // support both raw responses and { data } api envelopes.
+        setState({ data: body.data || body, loading: false, error: null });
+      })
       .catch((error) => {
         if (error.name !== "AbortError")
           setState({ data: [], loading: false, error });
       });
+    // stop an old request from updating state after the resource changes.
     return () => controller.abort();
   }, [path, reloadKey]);
 

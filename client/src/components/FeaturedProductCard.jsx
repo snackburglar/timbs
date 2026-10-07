@@ -50,6 +50,7 @@ const Price = styled.p`
 `;
 
 function FeaturedProductCard({ product }) {
+  // format numbers for display but allow preformatted values from other sources.
   const price =
     typeof product.price === "number"
       ? product.price.toLocaleString("en-AU", {

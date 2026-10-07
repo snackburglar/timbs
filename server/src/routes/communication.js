@@ -7,6 +7,7 @@ const { contactSchema, newsletterSchema } = require("../validation/schemas");
 const router = express.Router();
 
 router.post("/contact", validateBody(contactSchema), (req, res) => {
+  // capture receipt time on the server so clients cannot set it themselves.
   contactMessages.push({
     id: `message-${Date.now()}`,
     ...req.body,
@@ -17,6 +18,7 @@ router.post("/contact", validateBody(contactSchema), (req, res) => {
 
 router.post("/newsletter", validateBody(newsletterSchema), (req, res) => {
   const email = req.body.email.toLowerCase();
+  // repeated sign-ups should not create duplicate entries.
   if (!subscriptions.includes(email)) subscriptions.push(email);
   res.status(201).json({ message: "You are subscribed to club updates" });
 });

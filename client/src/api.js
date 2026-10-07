@@ -22,7 +22,9 @@ export async function apiRequest(path, options = {}) {
     ...options,
     headers,
   });
+  // 204 responses deliberately have no json body to parse.
   const body = response.status === 204 ? null : await response.json();
+  // keep the status available so callers can handle specific failures.
   if (!response.ok)
     throw new ApiError(
       body?.error || "The request could not be completed",
@@ -34,6 +36,7 @@ export async function apiRequest(path, options = {}) {
 export function setAuthSession(session) {
   window.localStorage.setItem(TOKEN_KEY, session.token);
   window.localStorage.setItem(USER_KEY, JSON.stringify(session.user));
+  // storage events do not fire in the tab that made the change.
   window.dispatchEvent(new Event("timbertop-auth-change"));
 }
 
