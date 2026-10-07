@@ -1,7 +1,6 @@
 # Timbertop United Shop
 
-Timbertop United Shop is a full-stack football club merchandise prototype. The React/Vite client consumes a Node/Express REST API. The API currently uses local in-memory mock modules instead of Firestore, so write operations reset when the server restarts.
-
+Timbertop United Shop is a full-stack football club merchandise prototype. The React/Vite client consumes a Node/Express REST API.
 ## Requirements
 
 - Node.js 18 or later
@@ -19,14 +18,20 @@ cd ../server
 npm install
 ```
 
-Create `server/.env` from `server/.env.example` and set a private `JWT_SECRET`. Create `client/.env` from `client/.env.example` if the API is not running at the default URL. The default admin account is:
+### Environment secrets
+
+**Server**: Create `server/.env` from `server/.env.example` and set a private `JWT_SECRET`. 
+
+**Client**: Create `client/.env` from `client/.env.example` if the API is not running at the default URL. 
+
+---
+
+The default admin account is:
 
 ```text
 Email: admin@timbertop.com
 Password: Admin123!
 ```
-
-Change the admin password before sharing the application. `server/.env` is ignored by Git.
 
 Start the API in one terminal:
 
@@ -46,7 +51,7 @@ The API listens on `http://localhost:1337` by default. The client uses that API 
 
 ## API
 
-All successful API responses are JSON. Product and news reads are public. Product writes require a bearer token for an administrator.
+All successful API responses are JSON.
 
 | Method | Route | Access | Purpose |
 | --- | --- | --- | --- |
@@ -66,15 +71,3 @@ All successful API responses are JSON. Product and news reads are public. Produc
 | GET | `/api/users/me` | Authenticated | Read the current user without password data |
 | POST | `/api/contact` | Public | Submit a contact message to local memory |
 | POST | `/api/newsletter` | Public | Subscribe an email address to local memory |
-
-Product writes require these fields: `name`, `category`, `price`, `initials`, `colour`, `description`, and `available`. Product and registration payloads are validated with Joi before use.
-
-Example login:
-
-```bash
-curl -X POST http://localhost:1337/api/users/login \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@timbertop.com","password":"Admin123!"}'
-```
-
-Use the returned token as `Authorization: Bearer <token>` for admin writes.
