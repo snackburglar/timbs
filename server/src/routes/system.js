@@ -1,4 +1,5 @@
 const express = require("express");
+require("../store");
 
 const router = express.Router();
 
@@ -7,8 +8,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/api/health", (req, res) => {
-  // expose the active storage mode for quick environment checks.
-  res.json({ status: "ok", storage: "local-mock" });
+  res.json({ status: "ok", storage: "firestore" });
 });
 
 module.exports = router;

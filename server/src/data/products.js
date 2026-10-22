@@ -1,4 +1,4 @@
-// temporary storage before firestore
+// Starter catalog used to initialize a new Firestore database.
 module.exports = [
   {
     id: "home-shirt",

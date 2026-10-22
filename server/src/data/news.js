@@ -1,4 +1,4 @@
-// temporary storage before firestore
+// Starter articles used to initialize a new Firestore database.
 module.exports = [
   {
     id: "season-opener",

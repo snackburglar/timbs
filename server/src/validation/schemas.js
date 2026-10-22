@@ -1,6 +1,5 @@
 const Joi = require("joi");
 
-// schemas trim and bound input before route handlers store or use it.
 const productSchema = Joi.object({
   name: Joi.string().trim().min(2).max(100).required(),
   category: Joi.string().trim().min(2).max(50).required(),

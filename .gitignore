@@ -1,4 +1,7 @@
 .env
+server/service-account*.json
+server/firebase-service-account*.json
+server/*-firebase-adminsdk-*.json
 
 # Logs
 logs

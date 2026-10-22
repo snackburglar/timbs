@@ -1,26 +1,27 @@
 const jwt = require("jsonwebtoken");
 
 const { jwtSecret } = require("../config");
-const { users } = require("../store");
+const store = require("../store");
 
-function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
   const authorization = req.get("authorization");
   const token = authorization?.startsWith("Bearer ")
     ? authorization.slice(7)
     : null;
   if (!token) return res.status(401).json({ error: "Authentication required" });
 
+  let payload;
   try {
-    const payload = jwt.verify(token, jwtSecret);
-    // look up the current record so role changes apply without reissuing tokens.
-    const user = users.find((candidate) => candidate.id === payload.sub);
-    if (!user)
-      return res.status(401).json({ error: "Authentication required" });
-    req.user = user;
-    return next();
+    payload = jwt.verify(token, jwtSecret);
   } catch {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
+
+  // look up the current record so role changes apply without reissuing tokens.
+  const user = await store.get("users", payload.sub);
+  if (!user) return res.status(401).json({ error: "Authentication required" });
+  req.user = user;
+  return next();
 }
 
 function requireAdmin(req, res, next) {

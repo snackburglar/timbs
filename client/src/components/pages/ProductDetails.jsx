@@ -60,7 +60,7 @@ function ProductDetails() {
         <p>{product.description}</p>
         <p>
           {product.available
-            ? "Available for the prototype shop"
+            ? "Available"
             : "Currently unavailable"}
         </p>
         <Link to="/products">Back to products</Link>

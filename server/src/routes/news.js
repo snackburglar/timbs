@@ -2,21 +2,22 @@ const express = require("express");
 
 const { authenticate, requireAdmin } = require("../middleware/auth");
 const validateBody = require("../middleware/validateBody");
-const { news } = require("../store");
+const store = require("../store");
 const { newsSchema } = require("../validation/schemas");
 const { makeId } = require("../utils");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+  const news = await store.list("news");
   res.json({
-    // sort a copy so reads do not mutate the shared in-memory collection.
+    // Sort the fetched records without changing their stored order.
     data: [...news].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
   });
 });
 
-router.get("/:id", (req, res) => {
-  const article = news.find((candidate) => candidate.id === req.params.id);
+router.get("/:id", async (req, res) => {
+  const article = await store.get("news", req.params.id);
   if (!article)
     return res.status(404).json({ error: "News article not found" });
   return res.json({ data: article });
@@ -27,18 +28,17 @@ router.post(
   authenticate,
   requireAdmin,
   validateBody(newsSchema),
-  (req, res) => {
+  async (req, res) => {
     const article = {
       id: makeId(req.body.title),
       publishedAt: req.body.publishedAt || new Date().toISOString(),
       ...req.body,
     };
-    if (news.some((candidate) => candidate.id === article.id)) {
+    if (!(await store.create("news", article))) {
       return res
         .status(409)
         .json({ error: "A news article with that title already exists" });
     }
-    news.push(article);
     return res.status(201).json({ data: article });
   },
 );
@@ -48,25 +48,26 @@ router.put(
   authenticate,
   requireAdmin,
   validateBody(newsSchema),
-  (req, res) => {
-    const index = news.findIndex((candidate) => candidate.id === req.params.id);
-    if (index === -1)
+  async (req, res) => {
+    const previous = await store.get("news", req.params.id);
+    if (!previous)
       return res.status(404).json({ error: "News article not found" });
-    news[index] = {
+    const article = {
       id: req.params.id,
       // keep the existing timestamp when the update omits one.
-      publishedAt: news[index].publishedAt,
+      publishedAt: previous.publishedAt,
       ...req.body,
     };
-    return res.json({ data: news[index] });
+    const updated = await store.replace("news", req.params.id, article);
+    if (!updated)
+      return res.status(404).json({ error: "News article not found" });
+    return res.json({ data: updated });
   },
 );
 
-router.delete("/:id", authenticate, requireAdmin, (req, res) => {
-  const index = news.findIndex((candidate) => candidate.id === req.params.id);
-  if (index === -1)
+router.delete("/:id", authenticate, requireAdmin, async (req, res) => {
+  if (!(await store.remove("news", req.params.id)))
     return res.status(404).json({ error: "News article not found" });
-  news.splice(index, 1);
   return res.status(204).send();
 });
 
