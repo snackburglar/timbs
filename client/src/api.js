@@ -1,6 +1,7 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_URL || "http://localhost:1337/api";
-let authSession = null;
+const TOKEN_KEY = "timbertop_token";
+const USER_KEY = "timbertop_user";
 
 class ApiError extends Error {
   constructor(message, status) {
@@ -14,7 +15,7 @@ export async function apiRequest(path, options = {}) {
   const headers = new Headers(options.headers);
   if (options.body && !(options.body instanceof FormData))
     headers.set("Content-Type", "application/json");
-  const token = authSession?.token;
+  const token = window.localStorage.getItem(TOKEN_KEY);
   if (token) headers.set("Authorization", `Bearer ${token}`);
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -33,15 +34,21 @@ export async function apiRequest(path, options = {}) {
 }
 
 export function setAuthSession(session) {
-  authSession = session;
+  window.localStorage.setItem(TOKEN_KEY, session.token);
+  window.localStorage.setItem(USER_KEY, JSON.stringify(session.user));
   window.dispatchEvent(new Event("timbertop-auth-change"));
 }
 
 export function clearAuthSession() {
-  authSession = null;
+  window.localStorage.removeItem(TOKEN_KEY);
+  window.localStorage.removeItem(USER_KEY);
   window.dispatchEvent(new Event("timbertop-auth-change"));
 }
 
 export function getStoredUser() {
-  return authSession?.user || null;
+  try {
+    return JSON.parse(window.localStorage.getItem(USER_KEY) || "null");
+  } catch {
+    return null;
+  }
 }
