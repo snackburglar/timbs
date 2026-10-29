@@ -1,10 +1,14 @@
 const bcrypt = require("bcryptjs");
-const { getFirestore } = require("firebase-admin/firestore");
+const { constants } = require("node:fs");
+const { copyFile, mkdir } = require("node:fs/promises");
+const path = require("node:path");
+const { FieldValue, getFirestore } = require("firebase-admin/firestore");
 
 const initialProducts = require("./data/products");
 const initialNews = require("./data/news");
 
 const { applicationDefault, initializeApp } = require("firebase-admin/app");
+const { adminPassword } = require("./config");
 initializeApp({
   credential: applicationDefault(),
   ...(process.env.FIREBASE_PROJECT_ID
@@ -17,7 +21,7 @@ const adminUser = {
   id: "00000000-0000-4000-8000-000000000001",
   name: "Timbertop Admin",
   email: (process.env.ADMIN_EMAIL || "admin@timbertop.com").toLowerCase(),
-  passwordHash: bcrypt.hashSync(process.env.ADMIN_PASSWORD || "Admin123!", 10),
+  passwordHash: bcrypt.hashSync(adminPassword, 12),
   role: "admin",
 };
 
@@ -28,6 +32,26 @@ const collections = {
   subscriptions: "subscriptions",
   contactMessages: "contactMessages",
 };
+
+const seededImageDirectory = path.join(__dirname, "data/product-images");
+const uploadedImageDirectory = path.join(__dirname, "../uploads/product-images");
+
+async function ensureSeedImages() {
+  await mkdir(uploadedImageDirectory, { recursive: true });
+  for (const product of initialProducts) {
+    const filename = new URL(product.imageUrl).pathname.split("/").pop();
+    try {
+      await copyFile(
+        path.join(seededImageDirectory, filename),
+        path.join(uploadedImageDirectory, filename),
+        constants.COPYFILE_EXCL,
+      );
+    } catch (error) {
+      // preserve an installed seed image and avoid overwriting admin uploads
+      if (error.code !== "EEXIST") throw error;
+    }
+  }
+}
 
 async function seedCollection(name, records) {
   const collection = db.collection(collections[name]);
@@ -40,15 +64,50 @@ async function seedCollection(name, records) {
   await batch.commit();
 }
 
+async function ensureConfiguredAdmin() {
+  // keep the configured bootstrap credentials authoritative for the fixed admin account
+  await db.collection(collections.users).doc(adminUser.id).set(adminUser, { merge: true });
+}
+
+async function migrateProductImages() {
+  // only starter records are migrated so custom products remain unchanged
+  const products = db.collection(collections.products);
+  const snapshot = await products.get();
+  const starterProducts = new Map(initialProducts.map((product) => [product.id, product]));
+  const batch = db.batch();
+  let hasUpdates = false;
+
+  for (const document of snapshot.docs) {
+    const starterProduct = starterProducts.get(document.id);
+    if (!starterProduct) continue;
+
+    const data = document.data();
+    const updates = {};
+    if (!data.imageUrl || data.imageUrl.startsWith("/images/")) {
+      updates.imageUrl = starterProduct.imageUrl;
+    }
+    if (Object.hasOwn(data, "initials")) updates.initials = FieldValue.delete();
+    if (Object.keys(updates).length) {
+      batch.update(document.ref, updates);
+      hasUpdates = true;
+    }
+  }
+
+  if (hasUpdates) await batch.commit();
+}
+
 let seedPromise;
+// share one initialization task across concurrent requests
 async function ensureSeeded() {
   if (!seedPromise) {
     seedPromise = (async () => {
+      await ensureSeedImages();
       await Promise.all([
         seedCollection("products", initialProducts),
         seedCollection("news", initialNews),
-        seedCollection("users", [adminUser]),
+        ensureConfiguredAdmin(),
       ]);
+      await migrateProductImages();
     })();
   }
   await seedPromise;

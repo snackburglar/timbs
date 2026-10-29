@@ -4,10 +4,15 @@ const productSchema = Joi.object({
   name: Joi.string().trim().min(2).max(100).required(),
   category: Joi.string().trim().min(2).max(50).required(),
   price: Joi.number().positive().precision(2).required(),
-  initials: Joi.string().trim().min(1).max(4).required(),
   colour: Joi.string()
     .pattern(/^#[0-9a-fA-F]{6}$/)
     .required(),
+  imageUrl: Joi.string()
+    .trim()
+    .max(2048)
+    .pattern(/^https?:\/\/\S+$/i)
+    .allow("")
+    .default(""),
   description: Joi.string().trim().min(5).max(500).required(),
   available: Joi.boolean().default(true),
 }).required();
@@ -27,7 +32,7 @@ const newsSchema = Joi.object({
 
 const credentialsSchema = Joi.object({
   email: Joi.string().trim().email().required(),
-  // cap password length before passing it to bcrypt.
+  // cap password length before passing it to bcrypt
   password: Joi.string().min(8).max(72).required(),
 }).required();
 

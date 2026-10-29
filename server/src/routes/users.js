@@ -1,5 +1,6 @@
 const bcrypt = require("bcryptjs");
 const express = require("express");
+const { rateLimit } = require("express-rate-limit");
 const jwt = require("jsonwebtoken");
 const { randomUUID } = require("node:crypto");
 
@@ -14,9 +15,23 @@ const {
 const { publicUser } = require("../utils");
 
 const router = express.Router();
+const registrationLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 5,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many registration attempts. Try again later." },
+});
+const loginLimit = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 10,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: { error: "Too many login attempts. Try again later." },
+});
 
-router.post("/register", validateBody(registrationSchema), async (req, res) => {
-  // one canonical form prevents duplicate accounts caused by email casing.
+router.post("/register", registrationLimit, validateBody(registrationSchema), async (req, res) => {
+  // one canonical form prevents duplicate accounts caused by email casing
   const email = req.body.email.toLowerCase();
   if (await store.findUserByEmail(email)) {
     return res
@@ -28,8 +43,8 @@ router.post("/register", validateBody(registrationSchema), async (req, res) => {
     id: randomUUID(),
     name: req.body.name,
     email,
-    // store only a salted hash, never the submitted password.
-    passwordHash: await bcrypt.hash(req.body.password, 10),
+    // store only a salted hash, never the submitted password
+    passwordHash: await bcrypt.hash(req.body.password, 12),
     role: "user",
   };
   if (!(await store.createUser(user))) {
@@ -40,14 +55,14 @@ router.post("/register", validateBody(registrationSchema), async (req, res) => {
   return res.status(201).json({ user: publicUser(user) });
 });
 
-router.post("/login", validateBody(credentialsSchema), async (req, res) => {
+router.post("/login", loginLimit, validateBody(credentialsSchema), async (req, res) => {
   const user = await store.findUserByEmail(req.body.email.toLowerCase());
   if (!user || !(await bcrypt.compare(req.body.password, user.passwordHash))) {
     return res.status(401).json({ error: "Invalid email or password" });
   }
 
   const token = jwt.sign({ role: user.role }, jwtSecret, {
-    // use the id as the subject so middleware can reload the current account.
+    // use the id as the subject so middleware can reload the current account
     subject: user.id,
     expiresIn: "2h",
   });

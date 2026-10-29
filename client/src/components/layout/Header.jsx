@@ -126,7 +126,7 @@ function Header() {
 
   function handleLogout() {
     clearAuthSession();
-    // don't leave signed-out users on pages that expect an active session.
+    // do not leave signed out users on pages that expect an active session
     if (
       location.pathname === "/profile" ||
       location.pathname.startsWith("/admin")
@@ -137,7 +137,7 @@ function Header() {
 
   useEffect(() => {
     const updateUser = () => setUser(getStoredUser());
-    // update the menu when login/logout changes the stored session.
+    // update the menu when login or logout changes the stored session
     window.addEventListener("timbertop-auth-change", updateUser);
     return () =>
       window.removeEventListener("timbertop-auth-change", updateUser);

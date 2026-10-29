@@ -2,7 +2,7 @@ import { Component } from "react";
 
 import ServerError from "./pages/ServerError";
 
-// Catches unexpected render errors so users receive the designed server-error view.
+// catches unexpected render errors so users receive the designed server error view
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -10,12 +10,12 @@ class ErrorBoundary extends Component {
   }
 
   static getDerivedStateFromError() {
-    // switch to the fallback on the next render after a child throws.
+    // switch to the fallback on the next render after a child throws
     return { hasError: true };
   }
 
   componentDidCatch(error) {
-    // keep a useful trace in the console while showing a friendly page.
+    // keep a useful trace in the console while showing a friendly page
     console.error(error.message);
   }
 

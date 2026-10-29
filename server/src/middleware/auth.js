@@ -17,7 +17,7 @@ async function authenticate(req, res, next) {
     return res.status(401).json({ error: "Invalid or expired token" });
   }
 
-  // look up the current record so role changes apply without reissuing tokens.
+  // look up the current record so role changes apply without reissuing tokens
   const user = await store.get("users", payload.sub);
   if (!user) return res.status(401).json({ error: "Authentication required" });
   req.user = user;
@@ -25,7 +25,7 @@ async function authenticate(req, res, next) {
 }
 
 function requireAdmin(req, res, next) {
-  // authenticate must run first so req.user is available here.
+  // authenticate must run first so req user is available here
   if (req.user.role !== "admin")
     return res.status(403).json({ error: "Administrator access required" });
   return next();

@@ -1,4 +1,4 @@
-// Starter articles used to initialize a new Firestore database.
+// starter articles used to initialize a new firestore database
 module.exports = [
   {
     id: "season-opener",

@@ -10,14 +10,14 @@ export default function useApiResource(path) {
     const controller = new AbortController();
     apiRequest(path, { signal: controller.signal })
       .then((body) => {
-        // support both raw responses and { data } api envelopes.
+        // support both raw responses and api data envelopes
         setState({ data: body.data || body, loading: false, error: null });
       })
       .catch((error) => {
         if (error.name !== "AbortError")
           setState({ data: [], loading: false, error });
       });
-    // stop an old request from updating state after the resource changes.
+    // stop an old request from updating state after the resource changes
     return () => controller.abort();
   }, [path, reloadKey]);
 

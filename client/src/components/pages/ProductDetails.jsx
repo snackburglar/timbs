@@ -17,17 +17,21 @@ const Details = styled.article`
 `;
 
 const Artwork = styled.div`
+  position: relative;
   display: grid;
   min-height: 20rem;
+  overflow: hidden;
   place-items: center;
   border-radius: 0.75rem;
   background: ${({ $colour }) => $colour};
   color: white;
 `;
 
-const Initials = styled.span`
-  font-size: 6rem;
-  font-weight: 800;
+const ProductImage = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 const Price = styled.p`
@@ -38,7 +42,7 @@ const Price = styled.p`
 
 function ProductDetails() {
   const { id } = useParams();
-  // the route id selects the record, with the usual 404 view for a missing item.
+  // the route id selects the record, with the usual not found view for a missing item
   const { data: product, loading, error } = useApiResource(`/products/${id}`);
   if (loading) return <p>Loading product...</p>;
   if (error?.status === 404) return <NotFound />;
@@ -51,7 +55,15 @@ function ProductDetails() {
   return (
     <Details>
       <Artwork $colour={product.colour}>
-        <Initials>{product.initials}</Initials>
+        {product.imageUrl && (
+          <ProductImage
+            src={product.imageUrl}
+            alt={product.name}
+            onError={(event) => {
+              event.currentTarget.style.display = "none";
+            }}
+          />
+        )}
       </Artwork>
       <div>
         <p>{product.category}</p>

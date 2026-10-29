@@ -11,7 +11,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   const news = await store.list("news");
   res.json({
-    // Sort the fetched records without changing their stored order.
+    // sort fetched records without changing their stored order
     data: [...news].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
   });
 });
@@ -54,7 +54,7 @@ router.put(
       return res.status(404).json({ error: "News article not found" });
     const article = {
       id: req.params.id,
-      // keep the existing timestamp when the update omits one.
+      // keep the existing timestamp when the update omits one
       publishedAt: previous.publishedAt,
       ...req.body,
     };

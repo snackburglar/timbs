@@ -22,9 +22,9 @@ export async function apiRequest(path, options = {}) {
     ...options,
     headers,
   });
-  // 204 responses deliberately have no json body to parse.
+  // 204 responses have no json body to parse
   const body = response.status === 204 ? null : await response.json();
-  // keep the status available so callers can handle specific failures.
+  // keep the status available so callers can handle specific failures
   if (!response.ok)
     throw new ApiError(
       body?.error || "The request could not be completed",
@@ -34,12 +34,14 @@ export async function apiRequest(path, options = {}) {
 }
 
 export function setAuthSession(session) {
+  // notify mounted components after both session values are stored
   window.localStorage.setItem(TOKEN_KEY, session.token);
   window.localStorage.setItem(USER_KEY, JSON.stringify(session.user));
   window.dispatchEvent(new Event("timbertop-auth-change"));
 }
 
 export function clearAuthSession() {
+  // use the same event for login and logout state updates
   window.localStorage.removeItem(TOKEN_KEY);
   window.localStorage.removeItem(USER_KEY);
   window.dispatchEvent(new Event("timbertop-auth-change"));
@@ -49,6 +51,7 @@ export function getStoredUser() {
   try {
     return JSON.parse(window.localStorage.getItem(USER_KEY) || "null");
   } catch {
+    // recover from malformed or manually edited local storage
     return null;
   }
 }

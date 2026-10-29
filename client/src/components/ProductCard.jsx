@@ -23,6 +23,7 @@ const ProductLink = styled(NavLink)`
 `;
 
 const Artwork = styled.div`
+  position: relative;
   display: grid;
   aspect-ratio: 1 / 1;
   place-items: center;
@@ -30,9 +31,11 @@ const Artwork = styled.div`
   color: #ffffff;
 `;
 
-const ArtworkInitials = styled.span`
-  font-size: clamp(2.5rem, 8vw, 4rem);
-  font-weight: 800;
+const ProductImage = styled.img`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 `;
 
 const ProductInfo = styled.div`
@@ -59,7 +62,7 @@ const Price = styled.p`
 `;
 
 function ProductCard({ product }) {
-  // keep formatted prices intact while formatting numeric api values.
+  // keep formatted prices intact while formatting numeric api values
   const price =
     typeof product.price === "number"
       ? product.price.toLocaleString("en-AU", {
@@ -72,7 +75,15 @@ function ProductCard({ product }) {
     <Card>
       <ProductLink to={`/products/${product.id}`}>
         <Artwork $colour={product.colour}>
-          <ArtworkInitials>{product.initials}</ArtworkInitials>
+          {product.imageUrl && (
+            <ProductImage
+              src={product.imageUrl}
+              alt={product.name}
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+            />
+          )}
         </Artwork>
         <ProductInfo>
           <Category>{product.category}</Category>

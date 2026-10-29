@@ -19,8 +19,8 @@ function emptyProduct() {
     name: "",
     category: "",
     price: "",
-    initials: "",
     colour: "#c1121f",
+    imageUrl: "",
     description: "",
     available: true,
   };
@@ -31,6 +31,7 @@ function ProductAdminPanel() {
   const [product, setProduct] = useState(emptyProduct);
   const [feedback, setFeedback] = useState("");
   const [feedbackError, setFeedbackError] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   function updateProduct(event) {
     const { name, value, type, checked } = event.target;
@@ -45,9 +46,31 @@ function ProductAdminPanel() {
     setFeedbackError(isError);
   }
 
+  async function uploadImage(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("image", file);
+    setUploadingImage(true);
+    try {
+      const response = await apiRequest("/uploads/images", {
+        method: "POST",
+        body: formData,
+      });
+      setProduct((current) => ({ ...current, imageUrl: response.data.imageUrl }));
+      showFeedback("Image uploaded. Save the product to apply it.");
+    } catch (error) {
+      showFeedback(error.message, true);
+    } finally {
+      setUploadingImage(false);
+      event.target.value = "";
+    }
+  }
+
   async function saveProduct(event) {
     event.preventDefault();
-    // ids are route data, while the form keeps price as a text input value.
+    // ids are route data, while the form keeps price as a text input value
     const { id, ...payload } = product;
 
     try {
@@ -114,17 +137,6 @@ function ProductAdminPanel() {
             required
           />
         </label>
-        <label htmlFor="admin-product-initials">
-          Artwork initials
-          <input
-            id="admin-product-initials"
-            name="initials"
-            maxLength="4"
-            value={product.initials}
-            onChange={updateProduct}
-            required
-          />
-        </label>
         <label htmlFor="admin-product-colour">
           Artwork colour
           <input
@@ -136,6 +148,28 @@ function ProductAdminPanel() {
             required
           />
         </label>
+        <label htmlFor="admin-product-image-upload">
+          Upload product image (JPEG, PNG, or WebP; max 5 MB)
+          <input
+            id="admin-product-image-upload"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={uploadImage}
+            disabled={uploadingImage}
+          />
+        </label>
+        <label htmlFor="admin-product-image-url">
+          Image URL
+          <input
+            id="admin-product-image-url"
+            name="imageUrl"
+            type="text"
+            value={product.imageUrl || ""}
+            onChange={updateProduct}
+            placeholder="Upload an image or paste an HTTPS URL"
+          />
+        </label>
+        {uploadingImage && <p role="status">Uploading image...</p>}
         <label htmlFor="admin-product-description">
           Description
           <textarea

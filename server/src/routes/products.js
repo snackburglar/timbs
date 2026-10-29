@@ -9,7 +9,7 @@ const { makeId } = require("../utils");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  // normalize filters so matching is case-insensitive and whitespace-tolerant.
+  // normalize filters so matching ignores case and surrounding whitespace
   const query = String(req.query.q || "")
     .trim()
     .toLowerCase();
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
     .trim()
     .toLowerCase();
   const sort = String(req.query.sort || "name");
-  // filter the collection first, then order only the records being returned.
+  // filter the collection first, then order only the records being returned
   const usesFirestoreSortKey = category && ["price-asc", "price-desc"].includes(sort);
   const products = usesFirestoreSortKey
     ? await store.listProductsByCategoryAndPrice(
@@ -55,7 +55,7 @@ router.post(
   requireAdmin,
   validateBody(productSchema),
   async (req, res) => {
-    // derive a stable route id from the name and reject collisions before saving.
+    // derive a stable route id from the name and reject collisions before saving
     const product = { id: makeId(req.body.name), ...req.body };
     if (!(await store.create("products", product))) {
       return res

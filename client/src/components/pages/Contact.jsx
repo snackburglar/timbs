@@ -57,7 +57,7 @@ function Contact() {
 
   async function submit(event) {
     event.preventDefault();
-    // clear stale feedback so it cannot be mistaken for this submission's result.
+    // clear stale feedback so it cannot be mistaken for this submission result
     setFeedback("");
     setError(false);
     try {
@@ -66,7 +66,7 @@ function Contact() {
         body: JSON.stringify(form),
       });
       setFeedback(response.message);
-      // keep entered details if the request fails so the user can retry.
+      // keep entered details if the request fails so the user can retry
       setForm({ name: "", email: "", message: "" });
     } catch (requestError) {
       setFeedback(requestError.message);

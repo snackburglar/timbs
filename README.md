@@ -21,7 +21,7 @@ npm install
 
 ### Environment secrets
 
-**Server**: Create `server/.env` from `server/.env.example` and set a private `JWT_SECRET`. 
+**Server**: Create `server/.env` from `server/.env.example`. Set a private random `JWT_SECRET` (at least 32 characters) and a unique `ADMIN_PASSWORD` (at least 12 characters). The API refuses to start with missing or placeholder values. Generate a random JWT secret with `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"`.
 
 **Client**: Create `client/.env` from `client/.env.example` if the API is not running at the default URL. 
 
@@ -31,19 +31,16 @@ To enable Firestore:
 
 1. Create a Firebase project and create a **Cloud Firestore** database in the Firebase Console.
 2. In **Project settings → Service accounts**, generate a private service-account JSON key. Save it as `server/service-account.json`. It is ignored by Git and must remain private.
-3. Set `FIREBASE_PROJECT_ID` to the Firebase project ID and `GOOGLE_APPLICATION_CREDENTIALS=./service-account.json` in `server/.env` (using the example file as a starting point).
-4. Start the server from the `server` directory with `npm run dev`. Check `http://localhost:1337/api/health`. Its `storage` value should be `firestore`.
+3. Set `FIREBASE_PROJECT_ID` and `GOOGLE_APPLICATION_CREDENTIALS=./service-account.json` in `server/.env` (using the example file as a starting point).
+4. Start the server from the `server` directory with `npm run dev`. Check `http://localhost:1337/api/health`.
 
-Firestore credentials are required to run the API. On first use, an empty Firestore database is initialized with the starter products, news articles, and the configured admin user. Starter products and news are only inserted if their collections are empty. Existing collections are left as-is. The default admin credentials are controlled by `ADMIN_EMAIL` and `ADMIN_PASSWORD` in `server/.env`.
+Firestore credentials are required to run the API. On first use, an empty Firestore database is initialized with the starter products and news articles, and the fixed admin account is synchronized to the configured `ADMIN_EMAIL` and `ADMIN_PASSWORD`. Starter products and news are only inserted if their collections are empty. Existing collections are left as-is.
+
+Product images are stored in the API server's `server/uploads/product-images/` folder,  Four sample photos are included under `server/src/data/product-images/`; the API copies them into the uploads folder and seeds their URLs with the starter products. Set `API_PUBLIC_URL` to the externally reachable server base URL when deploying. For deployment, use a host with persistent disk or uploaded images will be lost when its filesystem is reset.
 
 ---
 
-The default admin account is:
-
-```text
-Email: admin@timbertop.com
-Password: Admin123!
-```
+The admin email defaults to `admin@timbertop.com`; use the password set in `server/.env`.
 
 Start the API in one terminal:
 
@@ -73,6 +70,7 @@ All successful API responses are JSON.
 | POST | `/api/products` | Admin | Create a product |
 | PUT | `/api/products/:id` | Admin | Replace a product |
 | DELETE | `/api/products/:id` | Admin | Delete a product |
+| POST | `/api/uploads/images` | Admin | Upload a product image to the server (`multipart/form-data`, field `image`) |
 | GET | `/api/news` | Public | List articles, newest first |
 | GET | `/api/news/:id` | Public | Read one article |
 | POST | `/api/news` | Admin | Create an article |
